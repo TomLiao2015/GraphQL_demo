@@ -19,5 +19,14 @@
     "lodash": "^4.17.10",
     "mongodb": "^2.2.35",
     "mongoose": "^4.13.7"
+  },
+  "devDependencies": {
+    "eslint": "^4.7.2",
+    "eslint-config-standard": "^10.2.1",
+    "eslint-plugin-import": "^2.3.0",
+    "eslint-plugin-node": "^5.1.1",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-standard": "^3.0.1",
+    "uuid": "^3.3.2"
   }
 }

@@ -15,17 +15,17 @@ const DBBinary = Binary;
 module.exports.DBBinary = DBBinary;
 
 const executeQuery = (resolve, reject, callback) => {
-    // if (!shouldExecute()) return;
-    MongoClient.connect(dbAddress, (err, db) => {
-        if (err) {
-            logError(err);
-            reject(err);
-        } else {
-            callback(db, () => {
-                db.close();
-            });
-        }
-    });
+  // if (!shouldExecute()) return;
+  MongoClient.connect(dbAddress, (err, db) => {
+    if (err) {
+      console.log(err);
+      reject(err);
+    } else {
+      callback(db, () => {
+        db.close();
+      });
+    }
+  });
 };
 
 
@@ -36,16 +36,15 @@ const executeQuery = (resolve, reject, callback) => {
  * @returns Promise
  */
 const readCollection = (collectionName, filter, projection) => (new Promise((resolve, reject) => executeQuery(resolve, reject, (db, closeDB) => {
-    let cursor = db.collection(collectionName).find(filter || {}, projection);
-    cursor.toArray((err, result) => {
-        if (err) {
-            reject(err);
-        } else {
-            convertIdOut(result);
-            resolve(result);
-        }
-        closeDB();
-    });
+  let cursor = db.collection(collectionName).find(filter || {}, projection);
+  cursor.toArray((err, result) => {
+    if (err) {
+      reject(err);
+    } else {
+      resolve(result);
+    }
+    closeDB();
+  });
 })));
 
 module.exports.readCollection = readCollection;
@@ -57,19 +56,18 @@ module.exports.readCollection = readCollection;
  * @returns Promise
  */
 const aggregateCollection = (collectionName, aggregate) => (new Promise((resolve, reject) => executeQuery(resolve, reject, (db, closeDB) => {
-    if (!aggregate) {
-        reject(MISSING_AGGREGATE);
+  if (!aggregate) {
+    reject(MISSING_AGGREGATE);
+  }
+  let cursor = db.collection(collectionName).aggregate(aggregate);
+  cursor.toArray((err, result) => {
+    if (err) {
+      reject(err);
+    } else {
+      resolve(result);
     }
-    let cursor = db.collection(collectionName).aggregate(aggregate);
-    cursor.toArray((err, result) => {
-        if (err) {
-            reject(err);
-        } else {
-            convertIdOut(result);
-            resolve(result);
-        }
-        closeDB();
-    });
+    closeDB();
+  });
 })));
 
 module.exports.aggregateCollection = aggregateCollection;
@@ -81,16 +79,16 @@ module.exports.aggregateCollection = aggregateCollection;
  * @returns Promise
  */
 const insertDocuments = (collectionName, documents) => (
-    new Promise((resolve, reject) => executeQuery(resolve, reject, (db, closeDB) => {
-          db.collection(collectionName).insertMany(documents, (err, result) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(result);
-            }
-            closeDB();
-        });
-    }))
+  new Promise((resolve, reject) => executeQuery(resolve, reject, (db, closeDB) => {
+    db.collection(collectionName).insertMany(documents, (err, result) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(result);
+      }
+      closeDB();
+    });
+  }))
 );
 
 module.exports.insertDocuments = insertDocuments;
@@ -102,19 +100,16 @@ module.exports.insertDocuments = insertDocuments;
  * @returns Promise
  */
 const insertDocument = (collectionName, document) => (
-    new Promise((resolve, reject) => executeQuery(resolve, reject, (db, closeDB) => {
-        // TODO: this is a quick way which does not guarantee id uniqueness and may result in collision. It should be improved with read/retry
-        convertIdIn([document]);
-        db.collection(collectionName).insertOne(document, (err, result) => {
-            if (err) {
-                reject(err);
-            } else {
-                convertIdOut(result.ops);
-                resolve(result);
-            }
-            closeDB();
-        });
-    }))
+  new Promise((resolve, reject) => executeQuery(resolve, reject, (db, closeDB) => {
+    db.collection(collectionName).insertOne(document, (err, result) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(result);
+      }
+      closeDB();
+    });
+  }))
 );
 
 module.exports.insertDocument = insertDocument;
@@ -128,20 +123,19 @@ module.exports.insertDocument = insertDocument;
  * @returns Promise
  */
 const updateDocuments = (collectionName, filter, document, options) => (
-    new Promise((resolve, reject) => executeQuery(resolve, reject, (db, closeDB) => {
-        if (!filter) {
-            reject(MISSING_FILTER);
-        }
-        checkId(document);
-        db.collection(collectionName).update(filter, document, options, (err, result) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(result);
-            }
-            closeDB();
-        });
-    }))
+  new Promise((resolve, reject) => executeQuery(resolve, reject, (db, closeDB) => {
+    if (!filter) {
+      reject(MISSING_FILTER);
+    }
+    db.collection(collectionName).update(filter, document, options, (err, result) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(result);
+      }
+      closeDB();
+    });
+  }))
 );
 
 module.exports.updateDocuments = updateDocuments;
@@ -155,20 +149,19 @@ module.exports.updateDocuments = updateDocuments;
  * @returns Promise
  */
 const updateOneDocument = (collectionName, filter, document, options) => (
-    new Promise((resolve, reject) => executeQuery(resolve, reject, (db, closeDB) => {
-        if (!filter) {
-            reject(MISSING_FILTER);
-        }
-        checkId(document);
-        db.collection(collectionName).updateOne(filter, document, options || {}, (err, result) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(result);
-            }
-            closeDB();
-        });
-    }))
+  new Promise((resolve, reject) => executeQuery(resolve, reject, (db, closeDB) => {
+    if (!filter) {
+      reject(MISSING_FILTER);
+    }
+    db.collection(collectionName).updateOne(filter, document, options || {}, (err, result) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(result);
+      }
+      closeDB();
+    });
+  }))
 );
 
 module.exports.updateOneDocument = updateOneDocument;
@@ -180,19 +173,19 @@ module.exports.updateOneDocument = updateOneDocument;
  * @returns Promise
  */
 const deleteDocuments = (collectionName, filter) => (
-    new Promise((resolve, reject) => executeQuery(resolve, reject, (db, closeDB) => {
-        if (!filter) {
-            reject(MISSING_FILTER);
-        }
-        db.collection(collectionName).deleteMany(filter, (err, result) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(result);
-            }
-            closeDB();
-        });
-    }))
+  new Promise((resolve, reject) => executeQuery(resolve, reject, (db, closeDB) => {
+    if (!filter) {
+      reject(MISSING_FILTER);
+    }
+    db.collection(collectionName).deleteMany(filter, (err, result) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(result);
+      }
+      closeDB();
+    });
+  }))
 );
 
 module.exports.deleteDocuments = deleteDocuments;
@@ -203,16 +196,16 @@ module.exports.deleteDocuments = deleteDocuments;
  * @returns Promise
  */
 const dropCollection = (collectionName) => (
-    new Promise((resolve, reject) => executeQuery(resolve, reject, (db, closeDB) => {
-        db.collection(collectionName).drop((err, result) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(result);
-            }
-            closeDB();
-        });
-    }))
+  new Promise((resolve, reject) => executeQuery(resolve, reject, (db, closeDB) => {
+    db.collection(collectionName).drop((err, result) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(result);
+      }
+      closeDB();
+    });
+  }))
 );
 
 module.exports.dropCollection = dropCollection;
