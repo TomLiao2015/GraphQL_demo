@@ -10,3 +10,17 @@ module.exports.onError = (ctx, ex) => {
     ]
   };
 };
+
+module.exports.delete_Id = (data) => {
+
+  if (data instanceof Array) {
+    data.forEach(item => {
+      delete item._id;
+    });
+  } else {
+    if (data) {
+      delete data._id;
+    }
+  }
+  return data;
+};

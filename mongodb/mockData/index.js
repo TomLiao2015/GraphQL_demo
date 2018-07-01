@@ -22,6 +22,7 @@ const mock = {
         customerId: customerId,
         tranDay: new Date(),
         tranAmount: 200,
+        tranCurrency: 'CNY',
         fromAccount: '123-456-789',
         toAccount: '125-325-755'
       }]
