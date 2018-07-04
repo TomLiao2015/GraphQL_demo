@@ -4,6 +4,7 @@ const {
   GraphQLSchema,
   GraphQLObjectType,
   GraphQLString,
+  GraphQLBoolean,
   GraphQLFloat,
   GraphQLID,
   GraphQLList,
@@ -15,6 +16,17 @@ const {CustomerType} = require('./customer');
 const transactionDB = require('../mongodb/transactions');
 const customerDB = require('../mongodb/customers');
 
+module.exports.SuccessType = new GraphQLObjectType({
+  name: 'TransactionSuccess',
+  fields: {
+    success: {
+      type: GraphQLBoolean
+    },
+    message: {
+      type: GraphQLString
+    }
+  }
+});
 module.exports.TransactionInputType = new GraphQLInputObjectType({
   name: 'TransactionInput',
   fields: {
@@ -76,7 +88,8 @@ module.exports.getAllTransactions = {
   resolve: async (root, params, options) => {
     const transactions = await transactionDB.getAllTransactions();
     await Promise.all(transactions.map(async (item) => {
-      const customer = await customerDB.getCustomerById(item.id);
+      console.log('customerId-----', item.customerId);
+      const customer = await customerDB.getCustomerById(item.customerId);
       item.customer = customer;
     }));
     return transactions;
@@ -94,7 +107,7 @@ module.exports.getTransactionById = {
   resolve: async (root, params, options) => {
     const transaction = await transactionDB.getTransactionsById(params.id);
     if (transaction) {
-      const customer = await customerDB.getCustomerById(transaction[0].id);
+      const customer = await customerDB.getCustomerById(transaction[0].customerId);
       transaction[0].customer = customer;
       return transaction[0];
     } else {
@@ -124,23 +137,23 @@ module.exports.createTransaction = {
 module.exports.updateTransaction = {
   type: this.TransactionType,
   args: {
+    id: {
+      name: 'id',
+      type: new GraphQLNonNull(GraphQLString)
+    },
     transaction: {
       name: 'transaction',
       type: new GraphQLNonNull(this.TransactionInputType)
     }
   },
   resolve: async (root, params, options) => {
-    const transaction = await transactionDB.updateTransactions(params.transaction);
-    if (transaction) {
-      return transaction[0];
-    } else {
-      return {};
-    }
+    const transaction = await transactionDB.updateTransactions(params.id, params.transaction);
+    return transaction;
   }
 };
 
 module.exports.deleteTransaction = {
-  type: this.TransactionType,
+  type: this.SuccessType,
   args: {
     id: {
       name: 'id',
@@ -149,10 +162,6 @@ module.exports.deleteTransaction = {
   },
   resolve: async (root, params, options) => {
     const transaction = await transactionDB.deleteTransaction(params.id);
-    if (transaction) {
-      return transaction[0];
-    } else {
-      return {};
-    }
+    return transaction;
   }
 };

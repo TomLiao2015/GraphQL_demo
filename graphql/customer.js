@@ -1,9 +1,9 @@
-
 const {
   graphql,
   GraphQLSchema,
   GraphQLObjectType,
   GraphQLString,
+  GraphQLBoolean,
   GraphQLFloat,
   GraphQLID,
   GraphQLList,
@@ -14,7 +14,17 @@ const {
 } = require('graphql');
 const cumstomerDB = require('../mongodb/customers');
 
-
+module.exports.SuccessType = new GraphQLObjectType({
+  name: 'CustomerSuccess',
+  fields: {
+    success: {
+      type: GraphQLBoolean
+    },
+    message: {
+      type: GraphQLString
+    }
+  }
+});
 module.exports.CustomerInputType = new GraphQLInputObjectType({
   name: 'CustomerInput',
   fields: {
@@ -75,7 +85,6 @@ module.exports.CustomerType = new GraphQLObjectType({
   }
 });
 
-
 module.exports.getAllCustomers = {
   type: new GraphQLList(this.CustomerType),
   args: {},
@@ -125,23 +134,23 @@ module.exports.createCustomer = {
 module.exports.updateCustomer = {
   type: this.CustomerType,
   args: {
+    id: {
+      name: 'id',
+      type: new GraphQLNonNull(GraphQLString)
+    },
     customer: {
       name: 'customer',
       type: new GraphQLNonNull(this.CustomerInputType)
     }
   },
   resolve: async (root, params, options) => {
-    const customer = await cumstomerDB.updateCustomer(params.customer);
-    if (customer) {
-      return customer[0];
-    } else {
-      return {};
-    }
+    const customer = await cumstomerDB.updateCustomer(params.id, params.customer);
+    return customer;
   }
 };
 
 module.exports.deleteCustomer = {
-  type: this.CustomerType,
+  type: this.SuccessType,
   args: {
     id: {
       name: 'id',
@@ -150,11 +159,7 @@ module.exports.deleteCustomer = {
   },
   resolve: async (root, params, options) => {
     const customer = await cumstomerDB.deleteCustomer(params.id);
-    if (customer) {
-      return customer[0];
-    } else {
-      return {};
-    }
+    return customer;
   }
 };
 
