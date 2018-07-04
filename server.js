@@ -13,7 +13,7 @@ const port = process.env.PORT || 4000;
 
 app.use(bodyParser());
 
-app.use(KoaStatic(path.join(__dirname, 'public')));
+// app.use(KoaStatic(path.join(__dirname, 'public')));
 // CORS
 app.use(cors({ origin: '*', allowMethods: ['GET', 'POST', 'DELETE', 'PUT', 'OPTIONS'] }));
 

@@ -88,7 +88,6 @@ module.exports.getAllTransactions = {
   resolve: async (root, params, options) => {
     const transactions = await transactionDB.getAllTransactions();
     await Promise.all(transactions.map(async (item) => {
-      console.log('customerId-----', item.customerId);
       const customer = await customerDB.getCustomerById(item.customerId);
       item.customer = customer;
     }));
