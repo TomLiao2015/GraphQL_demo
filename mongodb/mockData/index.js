@@ -20,7 +20,7 @@ function createCustomers () {
       lastName: lastName[getRandomInt(0, 5)],
       birthday: '1987-01-01',
       country: countries[getRandomInt(0, 3)],
-      accountNumber: `${getRandomInt(0, 100)}-${getRandomInt(0, 100)}-${getRandomInt(0, 100)}`,
+      accountNumber: `${getRandomInt(100, 1000)}-${getRandomInt(100, 1000)}-${getRandomInt(100, 1000)}`,
       amount: getRandomInt(0, 5000),
       currency: currency[getRandomInt(0, 3)]
     };
