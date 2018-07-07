@@ -21,7 +21,10 @@
     "lodash": "^4.17.10",
     "mongodb": "^2.2.35",
     "mongoose": "^4.13.7",
-    "node-fetch": "^2.1.2"
+    "node-fetch": "^2.1.2",
+    "require-dir": "^1.0.0",
+    "swagger2": "^1.0.1",
+    "swagger2-koa": "^1.0.1"
   },
   "devDependencies": {
     "eslint": "^4.7.2",
